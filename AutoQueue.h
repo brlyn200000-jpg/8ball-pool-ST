@@ -41,8 +41,11 @@ void StartLastMatch() {
     LOGI("StartLastMatch");
 
     if (persistent_int["iAutoQueue_Mode"] == 0 && lastMatchInfo.set) {
-    _StartMatch(sharedMenuManager.instance, 0, lastMatchInfo.Tier, 0, 0, 0, 0, 0, 0, lastMatchInfo.arg10, lastMatchInfo.arg11);
+        // MODE 0: LAST SELECTED MATCH
+        LOGI("Starting last match: %s", lastMatchInfo.Tier.c_str());
+        _StartMatch(sharedMenuManager.instance, 0, lastMatchInfo.Tier, 0, 0, 0, 0, 0, 0, lastMatchInfo.arg10, lastMatchInfo.arg11);
     } else if (persistent_int["iAutoQueue_Mode"] == 1) {
+        // MODE 1: SMART MODE
         auto coins = sharedUserInfo.coins();
         auto maxBet = coins * persistent_int["iAutoQueue_BetPercent"] / 100;
         
