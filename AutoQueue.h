@@ -40,10 +40,14 @@ std::map<string, int64_t> modeBets = {
 void StartLastMatch() {
     LOGI("StartLastMatch");
 
-    if (persistent_int["iAutoQueue_Mode"] == 0 && lastMatchInfo.set) {
+    if (persistent_int["iAutoQueue_Mode"] == 0) {
         // MODE 0: LAST SELECTED MATCH
-        LOGI("Starting last match: %s", lastMatchInfo.Tier.c_str());
-        _StartMatch(sharedMenuManager.instance, 0, lastMatchInfo.Tier, 0, 0, 0, 0, 0, 0, lastMatchInfo.arg10, lastMatchInfo.arg11);
+        if (lastMatchInfo.set) {
+            LOGI("Starting last match: %s", lastMatchInfo.Tier.c_str());
+            _StartMatch(sharedMenuManager.instance, 0, lastMatchInfo.Tier, 0, 0, 0, 0, 0, 0, lastMatchInfo.arg10, lastMatchInfo.arg11);
+        } else {
+            LOGI("AutoQueue Mode 0: No previous match found, not starting");
+        }
     } else if (persistent_int["iAutoQueue_Mode"] == 1) {
         // MODE 1: SMART MODE
         auto coins = sharedUserInfo.coins();
@@ -66,6 +70,13 @@ void StartLastMatch() {
 
 DEFINE(int64_t, popMenuState, int64_t arg1, int64_t arg2, int32_t arg3, int64_t arg4) {
     LOGI("popMenuState arg1 %p, arg2 %p, arg3 %d, arg4 %p", arg1, arg2, arg3, arg4);
+    
+    // Hook: If AutoQueue is enabled, start the match after menu closes
+    if (persistent_int["iAutoQueue_Enabled"] == 1) {
+        LOGI("AutoQueue: Menu closing, starting queued match");
+        StartLastMatch();
+    }
+    
     return _popMenuState(arg1, arg2, arg3, arg4);
 }
 
